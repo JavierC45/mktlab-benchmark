@@ -454,12 +454,14 @@ input::placeholder{color:var(--muted)}
 const API_BASE = window.location.origin; // funciona igual en local y Railway
 
 /* Verificar si la key ya está configurada en el servidor */
+window._serverKeyConfigured = false;
+
 async function checkServerKey() {
   try {
     const r = await fetch(`${API_BASE}/api/key-configured`);
     const d = await r.json();
     if (d.configured) {
-      // Key en servidor — ocultar campo y mostrar mensaje
+      window._serverKeyConfigured = true;
       const field = document.getElementById('ant-key-field');
       const hint  = document.getElementById('key-hint');
       if (field) field.style.display = 'none';
@@ -622,7 +624,9 @@ async function startBenchmark() {
   const urls   = getUrls();
   const workers= parseInt(document.getElementById('workers').value)||3;
 
-  if (!antKey)           return alert('Ingresá tu Anthropic API Key.');
+  // La key puede estar vacía si está configurada en el servidor
+  const keyOk = antKey || window._serverKeyConfigured;
+  if (!keyOk)            return alert('Ingresá tu Anthropic API Key.');
   if (urls.length < 2)   return alert('Agregá al menos 2 URLs.');
   if (yoursIndex >= urls.length) return alert('El índice de "tu sitio" está fuera de rango.');
 
