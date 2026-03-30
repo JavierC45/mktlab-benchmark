@@ -1,0 +1,379 @@
+{
+  "report_metadata": {
+    "generated_at": "2026-03-30T09:16:11.326752",
+    "sites_analysed": 3,
+    "your_site_url": "https://www.cerem.es",
+    "competitor_urls": [
+      "https://www.unir.net",
+      "https://www.ceupe.com/"
+    ]
+  },
+  "executive_summary": "Benchmark completado para 3 sitios. Score de tu sitio: 83/100.",
+  "positioning": {
+    "market_map": [
+      {
+        "url": "https://www.cerem.es",
+        "label": "your_site",
+        "position_claim": "Escuela de negocios online #1 con 45 años formando ejecutivos exitosos",
+        "owns_attribute": "Trayectoria consolidada y resultados de empleabilidad comprobados",
+        "target_segment": "Ejecutivos y profesionales que buscan ascenso laboral",
+        "differentiation_score": 8
+      },
+      {
+        "url": "https://www.unir.net",
+        "label": "competitor",
+        "position_claim": "Universidad online oficial con títulos reconocidos y metodología 100% virtual flexible",
+        "owns_attribute": "Titulación universitaria oficial y reconocimiento QS Stars",
+        "target_segment": "Estudiantes y profesionales que buscan títulos oficiales con flexibilidad",
+        "differentiation_score": 9
+      },
+      {
+        "url": "https://www.ceupe.com/",
+        "label": "competitor",
+        "position_claim": "Escuela de negocios con MBA especializado y modelo práctico learning by doing",
+        "owns_attribute": "Especialización diversificada en múltiples áreas de negocio",
+        "target_segment": "Profesionales que buscan especializarse en áreas directivas",
+        "differentiation_score": 5
+      }
+    ],
+    "positioning_gaps": [
+      "Formación ejecutiva presencial premium con inmersión internacional intensiva",
+      "Programas de certificación rápida para habilidades específicas de alta demanda",
+      "Educación ejecutiva con garantía de retorno de inversión o colocación laboral",
+      "Formación online con mentoría personalizada uno a uno con ejecutivos activos",
+      "Programas enfocados exclusivamente en emprendimiento y startups"
+    ],
+    "positioning_conflicts": [
+      {
+        "sites": [
+          "https://www.cerem.es",
+          "https://www.ceupe.com/"
+        ],
+        "overlap": "Liderazgo en formación de posgrado online para profesionales de negocios"
+      },
+      {
+        "sites": [
+          "https://www.unir.net",
+          "https://www.ceupe.com/"
+        ],
+        "overlap": "Mejor MBA online en el mercado hispanohablante"
+      },
+      {
+        "sites": [
+          "https://www.cerem.es",
+          "https://www.unir.net",
+          "https://www.ceupe.com/"
+        ],
+        "overlap": "Alianzas con universidades de prestigio como diferenciador"
+      }
+    ],
+    "strategic_whitespace": "Existe un espacio completamente abierto para posicionarse como la institución que garantiza resultados medibles de carrera con acompañamiento personalizado post-graduación. Ningún competidor articula claramente un compromiso con el éxito profesional más allá de estadísticas genéricas. CEREM podría capitalizar su dato del 70% de empleabilidad expandiéndolo hacia una propuesta de transformación profesional garantizada."
+  },
+  "gaps": {
+    "gaps": [
+      {
+        "dimension": "service_structure",
+        "gap_title": "Ausencia de títulos universitarios oficiales y grados",
+        "description": "UNIR ofrece grados universitarios y másteres oficiales con titulación reconocida. CEREM no comunica oferta de grados ni títulos oficiales universitarios.",
+        "seen_in_competitors": [
+          "https://www.unir.net"
+        ],
+        "impact_level": "crítico",
+        "effort_to_close": "alto"
+      },
+      {
+        "dimension": "service_structure",
+        "gap_title": "Sin programas de doctorado",
+        "description": "UNIR ofrece doctorados para investigación académica avanzada. CEREM no tiene esta oferta visible para el máximo nivel formativo.",
+        "seen_in_competitors": [
+          "https://www.unir.net"
+        ],
+        "impact_level": "alto",
+        "effort_to_close": "alto"
+      },
+      {
+        "dimension": "value_proposition",
+        "gap_title": "Falta acreditación QS Stars u otro ranking global",
+        "description": "UNIR destaca 5 estrellas QS Stars como validación internacional. CEREM solo menciona ranking El Mundo sin acreditaciones globales comparables.",
+        "seen_in_competitors": [
+          "https://www.unir.net"
+        ],
+        "impact_level": "alto",
+        "effort_to_close": "medio"
+      },
+      {
+        "dimension": "lead_capture",
+        "gap_title": "Sin eventos académicos gratuitos en directo",
+        "description": "UNIR ofrece eventos gratuitos con especialistas reconocidos como herramienta de engagement. CEREM no comunica eventos abiertos similares.",
+        "seen_in_competitors": [
+          "https://www.unir.net"
+        ],
+        "impact_level": "alto",
+        "effort_to_close": "bajo"
+      },
+      {
+        "dimension": "service_structure",
+        "gap_title": "MBA sin especialidades múltiples visibles",
+        "description": "CEUPE ofrece MBA con especialidades (Project Management, RRHH, Finanzas, Marketing). CEREM no segmenta visiblemente especialidades dentro del MBA.",
+        "seen_in_competitors": [
+          "https://www.ceupe.com/"
+        ],
+        "impact_level": "medio",
+        "effort_to_close": "bajo"
+      },
+      {
+        "dimension": "lead_capture",
+        "gap_title": "Ausencia de plataforma LXP visible para alumnos",
+        "description": "CEUPE muestra acceso directo a 'My LXP' como plataforma de aprendizaje experiencial. CEREM no evidencia tecnología similar de forma prominente.",
+        "seen_in_competitors": [
+          "https://www.ceupe.com/"
+        ],
+        "impact_level": "medio",
+        "effort_to_close": "medio"
+      },
+      {
+        "dimension": "value_proposition",
+        "gap_title": "Metodología pedagógica no diferenciada",
+        "description": "CEUPE comunica modelo 'Learning by doing' como diferencial metodológico. CEREM no articula una metodología propia distintiva.",
+        "seen_in_competitors": [
+          "https://www.ceupe.com/"
+        ],
+        "impact_level": "medio",
+        "effort_to_close": "bajo"
+      },
+      {
+        "dimension": "service_structure",
+        "gap_title": "Catálogo de áreas especializadas más limitado",
+        "description": "CEUPE cubre Medio Ambiente, Turismo, Derecho, Tecnología como verticales específicas. CEREM no muestra diversificación comparable de nichos.",
+        "seen_in_competitors": [
+          "https://www.ceupe.com/"
+        ],
+        "impact_level": "medio",
+        "effort_to_close": "medio"
+      },
+      {
+        "dimension": "lead_capture",
+        "gap_title": "CTA principal menos orientado a acción directa",
+        "description": "UNIR usa 'ENCUENTRA TU TÍTULO' como CTA directo de búsqueda activa. CEREM usa 'Contacto' genérico con menor impulso a exploración.",
+        "seen_in_competitors": [
+          "https://www.unir.net"
+        ],
+        "impact_level": "bajo",
+        "effort_to_close": "bajo"
+      }
+    ],
+    "your_site_advantages": [
+      {
+        "advantage": "Ranking #1 El Mundo 2025 en formación online categoría Empresa, posicionamiento local superior a competidores analizados",
+        "exploit_recommendation": "Crear badge visual prominente en todas las páginas y materiales promocionales destacando liderazgo 2025"
+      },
+      {
+        "advantage": "45+ años de trayectoria y 200.000 egresados superan ampliamente los números de CEUPE (15.000 alumnos)",
+        "exploit_recommendation": "Desarrollar campaña de testimonios históricos y casos de éxito de diferentes décadas"
+      },
+      {
+        "advantage": "70% de egresados mejoraron posición laboral es métrica de empleabilidad concreta que competidores no comunican",
+        "exploit_recommendation": "Amplificar con infografías y stories de alumni mostrando progresión salarial y promociones"
+      },
+      {
+        "advantage": "Global Business Immersion presencial en Madrid ofrece componente híbrido único no replicado por competidores 100% online",
+        "exploit_recommendation": "Posicionar GBI como experiencia premium diferencial con contenido inmersivo y testimonios de networking"
+      }
+    ],
+    "gap_summary": "CEREM carece de títulos oficiales universitarios, grados y doctorados que UNIR ofrece. Debe comunicar metodología propia, diversificar especialidades MBA y crear eventos gratuitos para engagement. Su fortaleza en ranking local y trayectoria debe potenciarse agresivamente."
+  },
+  "opportunities": {
+    "opportunities": [
+      {
+        "rank": 1,
+        "title": "Optimizar CTA principal con verbo de acción",
+        "type": "cta",
+        "action": "Cambiar el CTA genérico 'Contacto' por uno orientado a beneficio como 'Solicita tu beca ahora' o 'Descubre tu programa ideal'. Colocarlo con color contrastante y mayor prominencia visual en el hero.",
+        "expected_impact": "Aumento del 15-25% en tasa de clics del hero al formulario de contacto",
+        "time_to_implement": "horas",
+        "difficulty": "fácil",
+        "inspired_by": "https://www.unir.net"
+      },
+      {
+        "rank": 2,
+        "title": "Agregar eventos gratuitos como reductor de fricción",
+        "type": "confianza",
+        "action": "Implementar webinars o masterclasses gratuitas mensuales como punto de entrada de bajo compromiso. Promocionarlos en homepage con CTA secundario 'Asiste gratis a nuestra próxima masterclass'.",
+        "expected_impact": "Generación de leads cualificados con 30-40% más apertura al no requerir compromiso inmediato",
+        "time_to_implement": "semanas",
+        "difficulty": "medio",
+        "inspired_by": "https://www.unir.net"
+      },
+      {
+        "rank": 3,
+        "title": "Destacar metodología práctica explícitamente",
+        "type": "posicionamiento",
+        "action": "Incorporar en homepage una sección que explique la metodología de aprendizaje (casos prácticos, simuladores, mentorías). Usar el concepto 'Learning by doing' con ejemplos concretos de proyectos reales.",
+        "expected_impact": "Diferenciación clara frente a competidores y reducción de objeciones sobre aplicabilidad práctica",
+        "time_to_implement": "días",
+        "difficulty": "fácil",
+        "inspired_by": "https://www.ceupe.com/"
+      },
+      {
+        "rank": 4,
+        "title": "Crear buscador de programas interactivo",
+        "type": "servicio",
+        "action": "Desarrollar un widget tipo 'Encuentra tu programa ideal' con filtros por área, duración, nivel y objetivo profesional. Posicionarlo prominentemente en el hero como UNIR hace con su buscador.",
+        "expected_impact": "Mejora de la experiencia de usuario y reducción del 20% en tasa de rebote",
+        "time_to_implement": "semanas",
+        "difficulty": "medio",
+        "inspired_by": "https://www.unir.net"
+      },
+      {
+        "rank": 5,
+        "title": "Añadir testimonios en video de egresados",
+        "type": "confianza",
+        "action": "Grabar 5-8 testimonios breves (60-90 segundos) de egresados exitosos mostrando su progresión laboral. Integrarlos en la homepage con carrusel y en páginas de programas específicos.",
+        "expected_impact": "Aumento del 35% en conversiones al generar prueba social emocional y verificable",
+        "time_to_implement": "semanas",
+        "difficulty": "medio",
+        "inspired_by": null
+      },
+      {
+        "rank": 6,
+        "title": "Visibilizar precios y financiación claramente",
+        "type": "precio",
+        "action": "Incluir rangos de precio o mensualidades estimadas en cada programa. Crear calculadora de financiación interactiva que muestre opciones de pago y becas aplicables automáticamente.",
+        "expected_impact": "Reducción de fricción en el funnel y aumento del 20% en solicitudes de información cualificadas",
+        "time_to_implement": "semanas",
+        "difficulty": "medio",
+        "inspired_by": null
+      },
+      {
+        "rank": 7,
+        "title": "Amplificar el ranking #1 de El Mundo",
+        "type": "posicionamiento",
+        "action": "Crear badge visual prominente con el ranking #1 El Mundo 2025. Colocarlo en header fijo, hero y junto a cada CTA. Incluir enlace a fuente oficial para verificabilidad.",
+        "expected_impact": "Incremento inmediato de credibilidad y diferenciación frente a CEUPE y UNIR",
+        "time_to_implement": "horas",
+        "difficulty": "fácil",
+        "inspired_by": null
+      },
+      {
+        "rank": 8,
+        "title": "Desarrollar página de empleabilidad con datos",
+        "type": "confianza",
+        "action": "Crear landing específica de empleabilidad con estadísticas detalladas: empresas que contratan, salarios promedio por programa, tiempo hasta promoción. Incluir logos de empresas colaboradoras.",
+        "expected_impact": "Conversión de leads indecisos al demostrar ROI tangible de la inversión educativa",
+        "time_to_implement": "semanas",
+        "difficulty": "medio",
+        "inspired_by": null
+      },
+      {
+        "rank": 9,
+        "title": "Incorporar chat en vivo o WhatsApp Business",
+        "type": "servicio",
+        "action": "Implementar widget de chat con respuesta en menos de 2 minutos durante horario laboral. Añadir botón flotante de WhatsApp para consultas rápidas fuera de horario.",
+        "expected_impact": "Captura del 15-20% de visitantes que abandonan por falta de respuesta inmediata",
+        "time_to_implement": "días",
+        "difficulty": "fácil",
+        "inspired_by": null
+      },
+      {
+        "rank": 10,
+        "title": "Crear contenido SEO de comparativas de programas",
+        "type": "seo",
+        "action": "Desarrollar artículos comparativos tipo 'MBA online vs presencial', 'Mejores másteres en marketing digital 2025'. Optimizar para keywords de intención comparativa y decisión.",
+        "expected_impact": "Captura de tráfico orgánico cualificado en fase de consideración con 40% mayor intención de compra",
+        "time_to_implement": "semanas",
+        "difficulty": "medio",
+        "inspired_by": null
+      },
+      {
+        "rank": 11,
+        "title": "Segmentar copy por perfil profesional",
+        "type": "copy",
+        "action": "Crear variantes de headline y propuesta de valor para diferentes perfiles: emprendedores, ejecutivos corporativos, profesionales en transición. Usar segmentación por UTM o comportamiento.",
+        "expected_impact": "Aumento del 25% en relevancia percibida y engagement por personalización",
+        "time_to_implement": "semanas",
+        "difficulty": "difícil",
+        "inspired_by": null
+      },
+      {
+        "rank": 12,
+        "title": "Promocionar GBI como diferencial único",
+        "type": "posicionamiento",
+        "action": "Crear landing exclusiva para Global Business Immersion destacando la experiencia presencial en Madrid como valor único que competidores 100% online no ofrecen. Incluir galería y testimonios del evento.",
+        "expected_impact": "Diferenciación clara del modelo híbrido frente a competidores puramente virtuales",
+        "time_to_implement": "días",
+        "difficulty": "fácil",
+        "inspired_by": null
+      }
+    ],
+    "quick_wins": [
+      "Cambiar el CTA genérico 'Contacto' por uno orientado a beneficio como 'Solicita tu beca ahora' o 'Descubre tu programa ideal'. Colocarlo con color contrastante y mayor prominencia visual en el hero.",
+      "Crear badge visual prominente con el ranking #1 El Mundo 2025. Colocarlo en header fijo, hero y junto a cada CTA. Incluir enlace a fuente oficial para verificabilidad.",
+      "Incorporar en homepage una sección que explique la metodología de aprendizaje (casos prácticos, simuladores, mentorías). Usar el concepto 'Learning by doing' con ejemplos concretos de proyectos reales."
+    ],
+    "30_day_sprint": "Semana 1: Optimizar CTAs y amplificar badge de ranking #1. Semana 2: Añadir sección de metodología práctica e implementar chat/WhatsApp. Semana 3: Desarrollar buscador de programas básico. Semana 4: Lanzar primera masterclass gratuita y comenzar grabación de testimonios en video."
+  },
+  "scoring": {
+    "scores": [
+      {
+        "url": "https://www.cerem.es",
+        "label": "your_site",
+        "dimensions": {
+          "value_proposition": 88,
+          "lead_capture": 82,
+          "brand_clarity": 85,
+          "service_structure": 78,
+          "differentiation": 75
+        },
+        "total_score": 83,
+        "score_rationale": "CEREM destaca por su propuesta de valor sólida con datos concretos (ranking #1, 200.000 egresados, 70% empleabilidad) y tono inspiracional efectivo. Pierde puntos en estructura de precios poco transparente y diferenciación moderada frente a competidores universitarios.",
+        "top_strength": "Ranking #1 El Mundo 2025 y dato de empleabilidad del 70% son pruebas contundentes.",
+        "critical_weakness": "Falta transparencia en precios y menor alcance de oferta vs universidades completas."
+      },
+      {
+        "url": "https://www.unir.net",
+        "label": "competitor",
+        "dimensions": {
+          "value_proposition": 85,
+          "lead_capture": 79,
+          "brand_clarity": 83,
+          "service_structure": 90,
+          "differentiation": 82
+        },
+        "total_score": 84,
+        "score_rationale": "UNIR sobresale por su estructura de servicios completa (grados, másteres, doctorados) y títulos oficiales reconocidos. Su calificación QS 5 estrellas aporta credibilidad internacional, aunque su CTA principal es menos directo que el de competidores.",
+        "top_strength": "Oferta educativa completa con títulos oficiales y reconocimiento QS Stars internacional.",
+        "critical_weakness": "CTAs dispersos y menos enfocados en conversión directa; pricing no visible."
+      },
+      {
+        "url": "https://www.ceupe.com/",
+        "label": "competitor",
+        "dimensions": {
+          "value_proposition": 72,
+          "lead_capture": 65,
+          "brand_clarity": 70,
+          "service_structure": 75,
+          "differentiation": 60
+        },
+        "total_score": 70,
+        "score_rationale": "CEUPE presenta una oferta amplia pero con diferenciadores datados (mejor MBA 2015) y carece de reductores de fricción. Su tono es más funcional que inspiracional, limitando el engagement emocional con prospectos.",
+        "top_strength": "Amplia variedad de especializaciones MBA y alianzas universitarias establecidas.",
+        "critical_weakness": "Reconocimientos desactualizados y ausencia total de reductores de fricción en el sitio."
+      }
+    ],
+    "dimension_winners": {
+      "value_proposition": "https://www.cerem.es",
+      "lead_capture": "https://www.cerem.es",
+      "brand_clarity": "https://www.cerem.es",
+      "service_structure": "https://www.unir.net",
+      "differentiation": "https://www.unir.net"
+    },
+    "benchmark_leader": "https://www.unir.net",
+    "scoring_notes": "Puntuaciones calibradas con confianza alta dado el nivel de detalle en los análisis. UNIR lidera por mínimo margen gracias a su estructura de servicios superior; CEREM domina en comunicación de valor y captura de leads."
+  },
+  "strategic_verdict": {
+    "your_site_standing": "challenger",
+    "benchmark_leader": "https://www.unir.net",
+    "recommended_focus": "CEREM carece de títulos oficiales universitarios, grados y doctorados que UNIR ofrece. Debe comunicar metodología propia, diversificar especialidades MBA y crear eventos gratuitos para engagement. Su fortaleza en ranking local y trayectoria debe potenciarse agresivamente."
+  },
+  "markdown_report": ""
+}

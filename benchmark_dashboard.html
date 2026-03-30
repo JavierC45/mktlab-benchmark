@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmark Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060A;--bg2:#0D0D15;--bg3:#14141F;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --accent:#E8D44D;--accent2:#c9b73a;
+  --red:#E53535;--green:#22C55E;--yellow:#F59E0B;--orange:#F97316;--blue:#3B82F6;
+  --muted:#555566;--muted2:#8888AA;
+  --text:#F0F0FA;--text2:#B0B0C8;
+  --sans:'Inter',sans-serif;--body:'DM Sans',sans-serif;
+  --r:5px;--r2:10px;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.65;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.015) 3px,rgba(0,0,0,0.015) 4px)}
+
+/* Upload overlay */
+#overlay{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+#overlay.gone{display:none}
+.upload-box{border:1px dashed var(--border2);background:var(--bg2);border-radius:14px;padding:48px 60px;text-align:center;max-width:520px;width:100%;cursor:pointer;transition:.2s}
+.upload-box:hover,.upload-box.drag{border-color:var(--accent);background:var(--bg3)}
+.up-title{font-family:var(--sans);font-size:1.8rem;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}
+.up-sub{color:var(--muted2);font-size:.9rem;margin-bottom:24px;line-height:1.7}
+.up-sub code{color:var(--text2);font-family:var(--sans);font-size:.82rem;background:var(--bg3);padding:1px 6px;border-radius:3px}
+.btn-y{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#06060A;font-family:var(--sans);font-weight:700;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;padding:11px 22px;border-radius:var(--r);border:none;cursor:pointer;transition:.15s}
+.btn-y:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted2);font-family:var(--body);font-size:.85rem;padding:9px 18px;border:1px solid var(--border2);border-radius:var(--r);cursor:pointer;transition:.15s}
+.btn-ghost:hover{color:var(--text);background:var(--bg3)}
+#fi{display:none}
+
+/* Page */
+.page{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:0 28px 80px}
+
+/* Header */
+.hdr{padding:40px 0 30px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;animation:dn .5s ease both}
+.hdr-eye{font-family:var(--sans);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;font-weight:600}
+.hdr-title{font-family:var(--sans);font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;line-height:1.15;letter-spacing:-.02em}
+.hdr-meta{display:flex;gap:24px;margin-top:10px}
+.hdr-meta span{color:var(--muted2);font-size:.8rem}
+.hdr-meta strong{color:var(--text2);font-weight:500}
+.hdr-score{text-align:right}
+.big-score{font-family:var(--sans);font-size:3.2rem;font-weight:700;line-height:1;letter-spacing:-.03em}
+.big-label{color:var(--muted2);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;font-weight:500}
+
+/* Sections */
+.sec{margin-bottom:48px;animation:fi .5s ease both}
+.sec:nth-child(1){animation-delay:.05s}.sec:nth-child(2){animation-delay:.1s}.sec:nth-child(3){animation-delay:.15s}
+.sec:nth-child(4){animation-delay:.2s}.sec:nth-child(5){animation-delay:.25s}.sec:nth-child(6){animation-delay:.3s}
+.sec-hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.sec-n{font-family:var(--sans);font-size:.65rem;color:var(--muted);letter-spacing:.1em;font-weight:600}
+.sec-t{font-family:var(--sans);font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text2)}
+.sec-line{flex:1;height:1px;background:var(--border)}
+
+/* Summary */
+.sum-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r2);padding:24px 28px}
+.sum-text{font-family:var(--body);font-size:1rem;font-weight:400;color:var(--text);line-height:1.8}
+
+/* Score grid */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;position:relative;overflow:hidden;transition:.2s;cursor:default}
+.sc:hover{border-color:var(--border2);transform:translateY(-2px)}
+.sc.yours{border-color:rgba(232,212,77,.35);background:linear-gradient(135deg,var(--bg2),rgba(232,212,77,.04))}
+.sc.yours::before{content:'TU SITIO';position:absolute;top:10px;right:10px;font-family:var(--sans);font-size:.52rem;font-weight:700;letter-spacing:.1em;color:var(--accent);border:1px solid rgba(232,212,77,.35);padding:2px 7px;border-radius:3px}
+.sc-url{font-family:var(--sans);font-size:.68rem;font-weight:500;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:12px}
+.sc-total{font-family:var(--sans);font-size:2.8rem;font-weight:700;line-height:1;letter-spacing:-.03em;margin-bottom:2px}
+.sc-lbl{font-family:var(--sans);font-size:.62rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+.dbars{display:flex;flex-direction:column;gap:7px}
+.drow{display:flex;align-items:center;gap:8px}
+.dn2{font-family:var(--body);font-size:.68rem;font-weight:400;color:var(--text2);flex:0 0 140px;line-height:1.2}
+.dtrk{flex:1;height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.dfill{height:100%;border-radius:99px;width:0;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.dval{font-family:var(--sans);font-size:.7rem;font-weight:600;color:var(--text2);width:28px;text-align:right;flex-shrink:0}
+
+/* Radar */
+.radar-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
+.r-legend{display:flex;flex-direction:column;gap:10px}
+.r-li{display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:.8rem;color:var(--text2)}
+.r-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* Positioning */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:680px){.pgrid{grid-template-columns:1fr}}
+.pc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 20px;transition:.2s}
+.pc:hover{border-color:var(--border2)}
+.pc.yours{border-color:rgba(232,212,77,.28)}
+.pc-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.pc-url{font-family:var(--sans);font-size:.68rem;font-weight:500;color:var(--muted2)}
+.pc-diff{font-family:var(--sans);font-size:1.5rem;font-weight:700;color:var(--accent);letter-spacing:-.02em}
+.pc-claim{font-family:var(--body);font-size:.88rem;color:var(--text);margin-bottom:9px;line-height:1.5}
+.pc-tag{display:inline-block;font-family:var(--sans);font-size:.65rem;font-weight:500;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:3px 8px;color:var(--text2);margin:2px 2px 0 0}
+.ws-card{background:linear-gradient(135deg,rgba(232,212,77,.07),transparent);border:1px solid rgba(232,212,77,.22);border-radius:var(--r2);padding:18px 22px;margin-top:12px}
+.ws-lbl{font-family:var(--sans);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:8px}
+.ws-text{font-family:var(--body);font-size:.95rem;color:var(--text);line-height:1.7}
+.pgaps{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.pgap{font-family:var(--sans);font-size:.68rem;font-weight:500;padding:4px 11px;background:rgba(232,212,77,.09);border:1px solid rgba(232,212,77,.22);border-radius:99px;color:var(--accent)}
+.conflict{background:rgba(229,53,53,.07);border:1px solid rgba(229,53,53,.18);border-radius:var(--r);padding:11px 15px;margin-bottom:6px}
+.cf-sites{font-family:var(--sans);color:var(--red);font-size:.65rem;font-weight:600;margin-bottom:3px}
+.cf-ovlp{font-family:var(--body);color:var(--text2);font-size:.78rem}
+
+/* Gaps — colores semáforo */
+.glist{display:flex;flex-direction:column;gap:8px}
+.gc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;display:grid;grid-template-columns:100px 1fr auto;gap:16px;align-items:start;transition:.2s}
+.gc:hover{border-color:var(--border2)}
+.gc.critical{border-left:4px solid var(--red)}
+.gc.high{border-left:4px solid var(--orange)}
+.gc.medium{border-left:4px solid var(--yellow)}
+.gc.low{border-left:4px solid var(--green)}
+/* español */
+.gc.crítico{border-left:4px solid var(--red)}
+.gc.alto{border-left:4px solid var(--orange)}
+.gc.medio{border-left:4px solid var(--yellow)}
+.gc.bajo{border-left:4px solid var(--green)}
+.gi{display:flex;flex-direction:column;gap:5px}
+.gbadge{font-family:var(--sans);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 9px;border-radius:4px;display:inline-block}
+/* inglés */
+.bc{background:rgba(229,53,53,.18);color:#FF6B6B;border:1px solid rgba(229,53,53,.3)}
+.bh{background:rgba(249,115,22,.18);color:#FB923C;border:1px solid rgba(249,115,22,.3)}
+.bm{background:rgba(245,158,11,.18);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.bl{background:rgba(34,197,94,.18);color:#4ADE80;border:1px solid rgba(34,197,94,.3)}
+/* español — mismo mapeo */
+.bcritico{background:rgba(229,53,53,.18);color:#FF6B6B;border:1px solid rgba(229,53,53,.3)}
+.balto{background:rgba(249,115,22,.18);color:#FB923C;border:1px solid rgba(249,115,22,.3)}
+.bmedio{background:rgba(245,158,11,.18);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.bbajo{background:rgba(34,197,94,.18);color:#4ADE80;border:1px solid rgba(34,197,94,.3)}
+.geff{font-family:var(--sans);font-size:.65rem;font-weight:500;color:var(--muted2)}
+.gt{font-family:var(--sans);font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:5px}
+.gd{font-family:var(--body);font-size:.78rem;color:var(--muted2);line-height:1.6}
+.gdim{font-family:var(--sans);font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:rgba(255,255,255,.05);padding:3px 8px;border-radius:4px;white-space:nowrap;align-self:start;margin-top:2px}
+.adv-box{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:var(--r2);padding:16px 20px;margin-top:8px}
+.adv-lbl{font-family:var(--sans);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:10px}
+
+/* Opportunities */
+.olist{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:680px){.olist{grid-template-columns:1fr}}
+.oc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 20px;transition:.2s;position:relative}
+.oc:hover{border-color:var(--border2);transform:translateY(-1px)}
+.orank{position:absolute;top:-1px;left:-1px;font-family:var(--sans);font-weight:800;font-size:.72rem;color:#06060A;background:var(--accent);padding:3px 10px;border-radius:var(--r2) 0 var(--r) 0}
+.otitle{font-family:var(--sans);font-size:.9rem;font-weight:600;color:var(--text);margin:18px 0 6px;letter-spacing:-.01em}
+.oact{font-family:var(--body);font-size:.78rem;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+.oimpact{font-family:var(--body);font-size:.75rem;color:var(--green);margin-bottom:10px;font-weight:500}
+.ometa{display:flex;gap:6px;flex-wrap:wrap}
+.otag{font-family:var(--sans);font-size:.62rem;font-weight:500;padding:3px 8px;border-radius:4px}
+.tt{background:rgba(34,197,94,.12);color:#4ADE80}.td{background:rgba(59,130,246,.12);color:#60A5FA}
+.ty{background:rgba(255,255,255,.06);color:var(--muted2)}
+.qw{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:var(--r2);padding:18px 22px;margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:680px){.qw{grid-template-columns:1fr}}
+.qw-t{font-family:var(--sans);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--green);grid-column:1/-1;margin-bottom:4px}
+.qwi{font-family:var(--body);font-size:.8rem;color:var(--text);display:flex;gap:6px;align-items:flex-start;line-height:1.5}
+.qwb{color:var(--green);flex-shrink:0;font-weight:700}
+.sprint{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r2);padding:20px 24px;margin-top:12px}
+.sprint-l{font-family:var(--sans);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:8px}
+.sprint-t{font-family:var(--body);font-size:1rem;color:var(--text);line-height:1.75}
+
+/* Verdict */
+.vgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:860px){.vgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.vgrid{grid-template-columns:1fr}}
+.vc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px}
+.vl{font-family:var(--sans);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px}
+.vv{font-family:var(--body);font-size:.95rem;color:var(--text);line-height:1.55}
+.vv.hi{color:var(--accent);font-weight:500}
+.chip{display:inline-block;padding:5px 13px;font-family:var(--sans);font-weight:700;font-size:.72rem;border-radius:99px;text-transform:uppercase;letter-spacing:.07em}
+.c-leader{background:rgba(34,197,94,.15);color:#4ADE80;border:1px solid rgba(34,197,94,.32)}
+.c-challenger{background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.32)}
+.c-follower{background:rgba(249,115,22,.15);color:#FB923C;border:1px solid rgba(249,115,22,.32)}
+.c-niche{background:rgba(136,136,170,.15);color:var(--muted2);border:1px solid rgba(136,136,170,.32)}
+
+/* Footer */
+.foot{border-top:1px solid var(--border);padding:24px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.foot-brand{font-family:var(--sans);font-size:.75rem;font-weight:600;color:var(--text2)}
+.foot-ts{font-family:var(--sans);font-size:.7rem;color:var(--muted)}
+
+/* Reload */
+#rldbtn{position:fixed;bottom:22px;right:22px;z-index:50;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 16px;color:var(--muted2);font-size:.72rem;font-family:var(--sans);font-weight:500;cursor:pointer;transition:.15s}
+#rldbtn:hover{color:var(--text);border-color:var(--accent)}
+
+/* Animations */
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <div class="upload-box" id="dropzone">
+    <div class="up-title">Intelligence Dashboard</div>
+    <div class="up-sub">
+      Cargá el JSON generado por <code>compare_sites.py</code><br>
+      o explorá el dashboard con datos de ejemplo
+    </div>
+    <button class="btn-y" id="browsebtn">📂 Cargar JSON</button>
+    <input type="file" id="fi" accept=".json">
+  </div>
+  <button class="btn-ghost" id="demobtn">Ver demo con datos de ejemplo →</button>
+</div>
+
+<div id="dash" style="display:none">
+  <div class="page">
+    <div class="hdr">
+      <div>
+        <div class="hdr-eye">MKTLAB Quick Benchmarking Engine</div>
+        <div class="hdr-title">Benchmark Intelligence Report</div>
+        <div class="hdr-meta">
+          <span>Generado: <strong id="hdate">—</strong></span>
+          <span>Sitios: <strong id="hcount">—</strong></span>
+          <span>Tu sitio: <strong id="hyours">—</strong></span>
+        </div>
+      </div>
+      <div class="hdr-score">
+        <div class="big-score" id="hscore">—</div>
+        <div class="big-label">tu score total</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-n">01</span><span class="sec-t">Resumen Ejecutivo</span><div class="sec-line"></div></div>
+      <div class="sum-card"><div class="sum-text" id="execsum">—</div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-n">02</span><span class="sec-t">Puntajes por Sitio</span><div class="sec-line"></div></div>
+      <div class="sgrid" id="sgrid"></div>
+      <div class="radar-wrap">
+        <svg id="rsvg" width="300" height="300" viewBox="0 0 300 300"></svg>
+        <div class="r-legend" id="rleg"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-n">03</span><span class="sec-t">Mapa de Posicionamiento</span><div class="sec-line"></div></div>
+      <div class="pgrid" id="pgrid"></div>
+      <div id="pws"></div><div id="pconf"></div><div id="pgapchips"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-n">04</span><span class="sec-t">Gap Analysis</span><div class="sec-line"></div></div>
+      <div class="glist" id="glist"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-n">05</span><span class="sec-t">Oportunidades Rankeadas</span><div class="sec-line"></div></div>
+      <div class="olist" id="olist"></div>
+      <div id="qwbox"></div><div id="sprintbox"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-n">06</span><span class="sec-t">Veredicto Estratégico</span><div class="sec-line"></div></div>
+      <div class="vgrid" id="vgrid"></div>
+    </div>
+
+    <div class="foot">
+      <span class="foot-brand">© 2026 · R'Evolution Education Group TM · Powered by MktLab</span>
+      <span class="foot-ts" id="fts"></span>
+    </div>
+  </div>
+</div>
+
+<button id="rldbtn" style="display:none">⟳ Cargar nuevo JSON</button>
+
+<script>
+const COLORS=['#E8D44D','#5B9CF6','#3DDA84','#FF8C42','#B06EFF','#FF6B6B','#4EC9B0'];
+function scu(u){try{return new URL(u).hostname}catch{return u}}
+function scol(n){return n>=75?'var(--green)':n>=55?'var(--accent)':'var(--red)'}
+function ctr(el,to,ms=1200){
+  const t0=performance.now();
+  (function s(now){const p=Math.min((now-t0)/ms,1),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(e*to);if(p<1)requestAnimationFrame(s);
+  })(t0);
+}
+
+// ── Radar ──────────────────────────────────────────────────────────────
+function drawRadar(scores){
+  const svg=document.getElementById('rsvg');svg.innerHTML='';
+  const cx=150,cy=150,r=110;
+  const fk=['value_proposition','lead_capture','brand_clarity','service_structure','differentiation'];
+  const dl=['VP','LC','BC','SS','Dif'];
+  const N=fk.length;
+  const ang=fk.map((_,i)=>(i/N)*Math.PI*2-Math.PI/2);
+  function pt(a,v){const rv=(v/100)*r;return[cx+Math.cos(a)*rv,cy+Math.sin(a)*rv]}
+  function po(a){return[cx+Math.cos(a)*r,cy+Math.sin(a)*r]}
+  function el(tag,attrs){const e=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e}
+
+  // rings
+  [.2,.4,.6,.8,1].forEach(f=>{
+    const pts=ang.map(a=>`${cx+Math.cos(a)*r*f},${cy+Math.sin(a)*r*f}`).join(' ');
+    svg.appendChild(el('polygon',{points:pts,fill:'none',stroke:'rgba(255,255,255,0.06)','stroke-width':'1'}));
+  });
+  // spokes + labels
+  ang.forEach((a,i)=>{
+    const[x2,y2]=po(a);
+    svg.appendChild(el('line',{x1:cx,y1:cy,x2,y2,stroke:'rgba(255,255,255,0.07)','stroke-width':'1'}));
+    const lx=cx+Math.cos(a)*(r+17),ly=cy+Math.sin(a)*(r+17);
+    const t=el('text',{x:lx,y:ly,'text-anchor':'middle','dominant-baseline':'middle',fill:'#52525E','font-size':'10','font-family':'DM Mono,monospace'});
+    t.textContent=dl[i];svg.appendChild(t);
+  });
+  // data
+  scores.forEach((site,si)=>{
+    const vals=fk.map(k=>site.dimensions[k]||0);
+    const pts=ang.map((a,i)=>pt(a,vals[i]).join(',')).join(' ');
+    const col=COLORS[si%COLORS.length];
+    const poly=el('polygon',{points:pts,fill:col,'fill-opacity':site.label==='your_site'?'.15':'.07',stroke:col,'stroke-width':site.label==='your_site'?'2':'1.5','stroke-opacity':site.label==='your_site'?'1':'.55'});
+    svg.appendChild(poly);
+    ang.forEach((a,i)=>{
+      const[x,y]=pt(a,vals[i]);
+      svg.appendChild(el('circle',{cx:x,cy:y,r:'3',fill:col,'fill-opacity':'.85'}));
+    });
+  });
+  // legend
+  const leg=document.getElementById('rleg');leg.innerHTML='';
+  scores.forEach((s,si)=>{
+    const col=COLORS[si%COLORS.length];
+    const outline=s.label==='your_site'?`outline:2px solid ${col};outline-offset:2px`:'';
+    leg.innerHTML+=`<div class="r-li"><div class="r-dot" style="background:${col};${outline}"></div><span>${s.label==='your_site'?'⭐ ':''}<strong>${scu(s.url)}</strong></span><span style="color:var(--muted)"> — ${s.total_score}</span></div>`;
+  });
+}
+
+// ── Main render ────────────────────────────────────────────────────────
+function render(D){
+  const M=D.report_metadata||{};
+  document.getElementById('hdate').textContent=M.generated_at?new Date(M.generated_at).toLocaleString('es-AR',{dateStyle:'medium',timeStyle:'short'}):'—';
+  document.getElementById('hcount').textContent=M.sites_analysed||'—';
+  document.getElementById('hyours').textContent=scu(M.your_site_url||'');
+
+  const sc=D.scoring||{};
+  const ys=(sc.scores||[]).find(s=>s.label==='your_site');
+  const scel=document.getElementById('hscore');
+  if(ys){scel.style.color=scol(ys.total_score);ctr(scel,ys.total_score,1500);}
+
+  document.getElementById('execsum').textContent=D.executive_summary||'—';
+
+  // Score cards
+  const sg=document.getElementById('sgrid');sg.innerHTML='';
+  const DKS=['value_proposition','lead_capture','brand_clarity','service_structure','differentiation'];
+  const DLB=['Propuesta de Valor','Captación de Leads','Claridad de Marca','Estructura de Servicios','Diferenciación'];
+  (sc.scores||[]).forEach((site,si)=>{
+    const iy=site.label==='your_site';const col=COLORS[si%COLORS.length];
+    const div=document.createElement('div');div.className='sc'+(iy?' yours':'');
+    div.innerHTML=`<div class="sc-url">${scu(site.url)}</div>
+      <div class="sc-total" style="color:${scol(site.total_score)}">0</div>
+      <div class="sc-lbl">score total</div>
+      <div class="dbars">${DKS.map((k,i)=>`<div class="drow"><span class="dn2">${DLB[i]}</span><div class="dtrk"><div class="dfill" style="background:${col}" data-t="${site.dimensions[k]||0}"></div></div><span class="dval">${site.dimensions[k]||0}</span></div>`).join('')}</div>
+      <div style="margin-top:9px;font-size:.62rem;color:var(--muted2);border-top:1px solid var(--border);padding-top:7px;line-height:1.5"><span style="color:var(--green)">▲</span> ${site.top_strength||'—'}<br><span style="color:var(--red)">▼</span> ${site.critical_weakness||'—'}</div>`;
+    sg.appendChild(div);
+    const te=div.querySelector('.sc-total');setTimeout(()=>ctr(te,site.total_score,1200),si*110);
+    setTimeout(()=>div.querySelectorAll('.dfill').forEach(b=>b.style.width=b.dataset.t+'%'),280+si*70);
+  });
+  if(sc.scores?.length)drawRadar(sc.scores);
+
+  // Positioning
+  const pos=D.positioning||{};
+  const pg=document.getElementById('pgrid');pg.innerHTML='';
+  (pos.market_map||[]).forEach(s=>{
+    const iy=s.label==='your_site';
+    pg.innerHTML+=`<div class="pc${iy?' yours':''}">
+      <div class="pc-hdr"><div class="pc-url">${scu(s.url)}</div><div class="pc-diff">${s.differentiation_score}<span style="font-size:.65rem;color:var(--muted)">/10</span></div></div>
+      <div class="pc-claim">"${s.position_claim}"</div>
+      <span class="pc-tag">Owns: ${s.owns_attribute}</span><span class="pc-tag">${s.target_segment}</span>
+    </div>`;
+  });
+  if(pos.strategic_whitespace)document.getElementById('pws').innerHTML=`<div class="ws-card"><div class="ws-lbl">Strategic Whitespace</div><div class="ws-text">${pos.strategic_whitespace}</div></div>`;
+  if(pos.positioning_conflicts?.length)document.getElementById('pconf').innerHTML=`<div style="margin-top:12px"><div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:7px">Conflictos de posicionamiento</div>${pos.positioning_conflicts.map(c=>`<div class="conflict"><div class="cf-sites">${c.sites.map(scu).join(' ↔ ')}</div><div class="cf-ovlp">${c.overlap}</div></div>`).join('')}</div>`;
+  if(pos.positioning_gaps?.length)document.getElementById('pgapchips').innerHTML=`<div style="margin-top:12px"><div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:7px">Posiciones sin ocupar</div><div class="pgaps">${pos.positioning_gaps.map(g=>`<span class="pgap">${g}</span>`).join('')}</div></div>`;
+
+  // Gaps
+  const gaps=D.gaps||{};
+  const gl=document.getElementById('glist');gl.innerHTML='';
+  (gaps.gaps||[]).forEach(g=>{
+    const lvl=(g.impact_level||'').toLowerCase().trim();
+    // Mapeo inglés y español → clase CSS semáforo
+    const badgeMap={
+      'critical':'bc','crítico':'bcritico','critico':'bcritico',
+      'high':'bh','alto':'balto',
+      'medium':'bm','medio':'bmedio',
+      'low':'bl','bajo':'bbajo'
+    };
+    const borderMap={
+      'critical':'critical','crítico':'crítico','critico':'crítico',
+      'high':'high','alto':'alto',
+      'medium':'medium','medio':'medio',
+      'low':'low','bajo':'bajo'
+    };
+    const bc=badgeMap[lvl]||'bl';
+    const borderCls=borderMap[lvl]||lvl;
+    // Etiqueta en español
+    const labelES={'critical':'Crítico','crítico':'Crítico','critico':'Crítico','high':'Alto','alto':'Alto','medium':'Medio','medio':'Medio','low':'Bajo','bajo':'Bajo'};
+    const esfuerzoES={'low':'bajo','bajo':'bajo','medium':'medio','medio':'medio','high':'alto','alto':'alto'};
+    gl.innerHTML+=`<div class="gc ${borderCls}">
+      <div class="gi"><span class="gbadge ${bc}">${labelES[lvl]||g.impact_level}</span><span class="geff">esfuerzo: ${esfuerzoES[(g.effort_to_close||'').toLowerCase()]||g.effort_to_close}</span></div>
+      <div><div class="gt">${g.gap_title}</div><div class="gd">${g.description}</div>${g.seen_in_competitors?.length?`<div style="margin-top:5px;font-size:.65rem;color:var(--muted)">Visto en: ${g.seen_in_competitors.map(scu).join(', ')}</div>`:''}</div>
+      <span class="gdim">${g.dimension}</span></div>`;
+  });
+  if(gaps.your_site_advantages?.length)gl.innerHTML+=`<div class="adv-box"><div class="adv-lbl">Tus ventajas actuales</div>${gaps.your_site_advantages.map(a=>`<div style="margin-bottom:9px"><div style="font-size:.8rem;color:var(--text)">${a.advantage}</div><div style="font-size:.68rem;color:var(--muted2);margin-top:2px">→ ${a.exploit_recommendation}</div></div>`).join('')}</div>`;
+
+  // Opps
+  const op=D.opportunities||{};
+  const ol=document.getElementById('olist');ol.innerHTML='';
+  (op.opportunities||[]).forEach(o=>{
+    ol.innerHTML+=`<div class="oc"><div class="orank">${o.rank}</div>
+      <div class="otitle">${o.title}</div>
+      <div class="oact">${o.action}</div>
+      <div class="oimpact">${o.expected_impact}</div>
+      <div class="ometa"><span class="otag tt">⏱ ${o.time_to_implement}</span><span class="otag td">${o.difficulty}</span><span class="otag ty">${o.type}</span>${o.inspired_by?`<span class="otag ty">💡 ${scu(o.inspired_by)}</span>`:''}</div>
+    </div>`;
+  });
+  if(op.quick_wins?.length)document.getElementById('qwbox').innerHTML=`<div class="qw"><div class="qw-t">⚡ Quick Wins</div>${op.quick_wins.map(w=>`<div class="qwi"><span class="qwb">→</span>${w}</div>`).join('')}</div>`;
+  if(op['30_day_sprint'])document.getElementById('sprintbox').innerHTML=`<div class="sprint"><div class="sprint-l">🗓 Plan Sprint 30 días</div><div class="sprint-t">${op['30_day_sprint']}</div></div>`;
+
+  // Verdict
+  const v=D.strategic_verdict||{};
+  const sc2={leader:'c-leader',challenger:'c-challenger',follower:'c-follower',niche_player:'c-niche'}[v.your_site_standing]||'c-follower';
+  document.getElementById('vgrid').innerHTML=`
+    <div class="vc"><div class="vl">Tu posición en el mercado</div><span class="chip ${sc2}">${(v.your_site_standing||'—').replace('_',' ')}</span></div>
+    <div class="vc"><div class="vl">Mayor amenaza</div><div class="vv">${v.biggest_threat||'—'}</div></div>
+    <div class="vc"><div class="vl">Mayor oportunidad</div><div class="vv hi">${v.biggest_opportunity||'—'}</div></div>
+    <div class="vc" style="border-color:rgba(232,212,77,.2)"><div class="vl">Foco recomendado #1</div><div class="vv">${v.recommended_focus||'—'}</div></div>`;
+
+  document.getElementById('fts').textContent=`Generado ${new Date().toLocaleString('es-AR')}`;
+}
+
+// ── Load / Upload ───────────────────────────────────────────────────────
+function boot(data){
+  document.getElementById('overlay').classList.add('gone');
+  document.getElementById('dash').style.display='';
+  document.getElementById('rldbtn').style.display='';
+  render(data);
+}
+function parse(txt){try{boot(JSON.parse(txt))}catch(e){alert('JSON inválido: '+e.message)}}
+
+document.getElementById('browsebtn').onclick=()=>document.getElementById('fi').click();
+document.getElementById('fi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>parse(ev.target.result);r.readAsText(f)};
+document.getElementById('demobtn').onclick=()=>boot(DEMO);
+document.getElementById('rldbtn').onclick=()=>{document.getElementById('overlay').classList.remove('gone');document.getElementById('dash').style.display='none';document.getElementById('rldbtn').style.display='none'};
+
+const dz=document.getElementById('dropzone');
+dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag')};
+dz.ondragleave=()=>dz.classList.remove('drag');
+dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>parse(ev.target.result);r.readAsText(f)};
+
+// ── Demo Data ────────────────────────────────────────────────────────────
+const DEMO={
+  report_metadata:{generated_at:new Date().toISOString(),sites_analysed:4,your_site_url:'https://miagencia.com',competitor_urls:['https://rival-a.com','https://rival-b.com','https://rival-c.com']},
+  executive_summary:'miagencia.com presenta una propuesta de valor sólida en diseño UX pero carece de señales de confianza comparado con sus tres competidores analizados. rival-b.com lidera el benchmark con un score total de 84, especialmente en captación de leads donde supera al resto por 18 puntos. Las tres oportunidades de mayor impacto son: agregar casos de estudio con resultados medibles, incorporar CTAs contextuales por sección de servicio, y mostrar precios orientativos para reducir fricción. Implementando estas mejoras en 30 días se proyecta un incremento de 25-35% en conversión.',
+  positioning:{
+    market_map:[
+      {url:'https://miagencia.com',label:'your_site',position_claim:'Diseño UX que convierte negocios digitales',owns_attribute:'Diseño centrado en conversión',target_segment:'Startups y scale-ups B2B',differentiation_score:7},
+      {url:'https://rival-a.com',label:'competitor',position_claim:'Agencia full-stack para empresas en crecimiento',owns_attribute:'Stack tecnológico completo',target_segment:'Empresas medianas con presupuesto tecnológico',differentiation_score:5},
+      {url:'https://rival-b.com',label:'competitor',position_claim:'ROI medible en cada proyecto de marketing digital',owns_attribute:'Resultados con métricas garantizadas',target_segment:'E-commerce y retail online',differentiation_score:9},
+      {url:'https://rival-c.com',label:'competitor',position_claim:'Branding estratégico para marcas ambiciosas',owns_attribute:'Identidad de marca premium',target_segment:'Marcas de consumo aspiracional',differentiation_score:8},
+    ],
+    positioning_gaps:['Especialista SaaS B2B','Precios fijos productizados','Posicionamiento por vertical de industria'],
+    positioning_conflicts:[{sites:['https://miagencia.com','https://rival-a.com'],overlap:'Ambas reclaman diseño orientado a resultados sin métricas concretas'}],
+    strategic_whitespace:'Ningún competidor se posiciona como especialista SaaS B2B con precios fijos y entregables claros. Este nicho combina alta demanda con baja saturación en el mercado hispanohablante.'
+  },
+  gaps:{
+    gaps:[
+      {dimension:'lead_capture',gap_title:'Sin casos de estudio con métricas',description:'Todos los competidores muestran resultados medibles (% conversión, ROI). miagencia.com solo muestra portafolio visual sin números.',seen_in_competitors:['https://rival-b.com','https://rival-c.com'],impact_level:'critical',effort_to_close:'medium'},
+      {dimension:'lead_capture',gap_title:'Ausencia de CTA secundario en servicios',description:'rival-a y rival-b tienen CTAs contextuales en cada sección de servicio. miagencia.com solo tiene CTA en el hero.',seen_in_competitors:['https://rival-a.com','https://rival-b.com'],impact_level:'high',effort_to_close:'low'},
+      {dimension:'service_structure',gap_title:'Precios opacos vs competencia productizada',description:'rival-b ofrece paquetes con precios desde/hasta. La ausencia de referencia de precio genera fricción innecesaria.',seen_in_competitors:['https://rival-b.com'],impact_level:'high',effort_to_close:'medium'},
+      {dimension:'value_proposition',gap_title:'Diferenciadores genéricos',description:'La propuesta de valor usa lenguaje intercambiable con cualquier agencia. rival-c usa afirmaciones únicas y verificables.',seen_in_competitors:['https://rival-c.com'],impact_level:'medium',effort_to_close:'low'},
+      {dimension:'brand_tone',gap_title:'Sin voz de marca distinguible',description:'El tono es profesional pero genérico. rival-c tiene una voz editorial reconocible que refuerza el posicionamiento premium.',seen_in_competitors:['https://rival-c.com'],impact_level:'medium',effort_to_close:'high'},
+    ],
+    your_site_advantages:[
+      {advantage:'Mayor claridad en proceso de trabajo — 4 pasos vs el promedio de 2 de los competidores',exploit_recommendation:'Hacer del proceso una sección hero secundaria con iconografía propia'},
+      {advantage:'Única en mencionar explícitamente diseño móvil-first en la propuesta de valor',exploit_recommendation:'Amplificar con estadísticas de tráfico mobile y capturas de proyectos en móvil'},
+    ]
+  },
+  opportunities:{
+    opportunities:[
+      {rank:1,title:'3 casos de estudio con métricas',type:'trust',action:'Publicar antes/después con % aumento tráfico, conversión y ROI. Mínimo uno por categoría de servicio.',expected_impact:'Incremento proyectado 25-35% en conversión a leads calificados',time_to_implement:'weeks',difficulty:'medium',inspired_by:'https://rival-b.com'},
+      {rank:2,title:'CTA contextual por sección de servicio',type:'cta',action:"Agregar botón 'Consultar precio' o 'Ver proyectos' al final de cada card de servicio.",expected_impact:'Reducción de bounce rate, +15-20% en micro-conversiones internas',time_to_implement:'days',difficulty:'easy',inspired_by:'https://rival-a.com'},
+      {rank:3,title:'Precios orientativos visibles',type:'pricing',action:"Agregar sección 'Proyectos desde $X' con descripción de qué incluye cada tier.",expected_impact:'Elimina fricción de consulta inicial, +30% en contactos calificados',time_to_implement:'days',difficulty:'easy',inspired_by:'https://rival-b.com'},
+      {rank:4,title:'Reescribir headline con diferenciador propio',type:'copy',action:"Reemplazar headline genérico por afirmación específica: quién sos, para quién, resultado concreto.",expected_impact:'Mejora VP score 15-20 puntos, reduce tasa de rebote',time_to_implement:'hours',difficulty:'easy',inspired_by:null},
+      {rank:5,title:'Social proof en el primer viewport',type:'trust',action:'Incorporar logos de clientes o número de proyectos completados antes del primer scroll.',expected_impact:'+20% tiempo en página y scroll-through',time_to_implement:'days',difficulty:'easy',inspired_by:'https://rival-b.com'},
+      {rank:6,title:'Landing pages por vertical',type:'positioning',action:'Crear 2-3 páginas específicas por industria para mejorar SEO y propuesta de valor segmentada.',expected_impact:'+40% conversión orgánica en verticales objetivo',time_to_implement:'months',difficulty:'hard',inspired_by:'https://rival-c.com'},
+    ],
+    quick_wins:['CTA contextual en secciones de servicio (1-2 días, impacto inmediato)','Precio orientativo "desde $X" en homepage (pocas horas)','Reescribir headline con diferenciador específico (1 hora)'],
+    '30_day_sprint':'Semana 1: reescribir headline + CTAs contextuales + precio orientativo. Semana 2-3: producir 2 casos de estudio con métricas reales. Semana 4: incorporar logos en hero y revisar métricas de conversión iniciales.'
+  },
+  scoring:{
+    scores:[
+      {url:'https://miagencia.com',label:'your_site',dimensions:{value_proposition:68,lead_capture:54,brand_clarity:72,service_structure:65,differentiation:70},total_score:65,top_strength:'Claridad de proceso de trabajo',critical_weakness:'Sin casos de estudio con métricas'},
+      {url:'https://rival-a.com',label:'competitor',dimensions:{value_proposition:71,lead_capture:72,brand_clarity:65,service_structure:80,differentiation:55},total_score:71,top_strength:'Estructura de servicios más completa',critical_weakness:'Posicionamiento diferenciado débil'},
+      {url:'https://rival-b.com',label:'competitor',dimensions:{value_proposition:82,lead_capture:88,brand_clarity:80,service_structure:85,differentiation:90},total_score:84,top_strength:'Métricas y resultados comprobables',critical_weakness:'Tono puede percibirse como agresivo'},
+      {url:'https://rival-c.com',label:'competitor',dimensions:{value_proposition:78,lead_capture:66,brand_clarity:88,service_structure:70,differentiation:85},total_score:77,top_strength:'Identidad de marca y tono editorial',critical_weakness:'Proceso de conversión con mucha fricción'},
+    ]
+  },
+  strategic_verdict:{
+    your_site_standing:'challenger',
+    biggest_threat:'rival-b.com — lidera en 4 de 5 dimensiones con métricas comprobables y conversión optimizada',
+    biggest_opportunity:'Nicho SaaS B2B sin ocupar + gaps de lead capture son quick wins de alto impacto con bajo esfuerzo',
+    recommended_focus:'Publicar 3 casos de estudio con métricas reales y agregar CTAs contextuales en secciones de servicio'
+  }
+};
+</script>
+</body>
+</html>
