@@ -335,8 +335,8 @@ input::placeholder{color:var(--muted)}
       </div>
     </div>
     <div style="font-size:.68rem;color:var(--muted);margin-top:-4px" id="key-hint">
-      🔒 La key se envía al servidor de forma segura. Nunca se almacena en el browser.<br>
-      🌐 El scraping usa <strong>Jina AI</strong> (gratis, sin API key).
+      🔒 Tu key se envía directo a Anthropic y no se almacena en ningún servidor.<br>
+      🌐 El scraping usa <strong>Jina AI</strong> (gratis, sin API key necesaria).
     </div>
   </div>
 
@@ -457,17 +457,7 @@ const API_BASE = window.location.origin; // funciona igual en local y Railway
 window._serverKeyConfigured = false;
 
 async function checkServerKey() {
-  try {
-    const r = await fetch(`${API_BASE}/api/key-configured`);
-    const d = await r.json();
-    if (d.configured) {
-      window._serverKeyConfigured = true;
-      const field = document.getElementById('ant-key-field');
-      const hint  = document.getElementById('key-hint');
-      if (field) field.style.display = 'none';
-      if (hint)  hint.innerHTML = '✅ API Key configurada en el servidor. No necesitás ingresarla.<br>🌐 Scraping con <strong>Jina AI</strong> (gratis).';
-    }
-  } catch(e) { /* servidor local sin el endpoint — no pasa nada */ }
+  // Key siempre requerida — cada usuario ingresa la suya
 }
 checkServerKey();
 let yoursIndex  = 0;
@@ -624,9 +614,7 @@ async function startBenchmark() {
   const urls   = getUrls();
   const workers= parseInt(document.getElementById('workers').value)||3;
 
-  // La key puede estar vacía si está configurada en el servidor
-  const keyOk = antKey || window._serverKeyConfigured;
-  if (!keyOk)            return alert('Ingresá tu Anthropic API Key.');
+  if (!antKey)           return alert('Ingresá tu Anthropic API Key.');
   if (urls.length < 2)   return alert('Agregá al menos 2 URLs.');
   if (yoursIndex >= urls.length) return alert('El índice de "tu sitio" está fuera de rango.');
 
