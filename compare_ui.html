@@ -327,14 +327,14 @@ input::placeholder{color:var(--muted)}
   <!-- API Keys -->
   <div class="card" id="keys-card">
     <div class="card-title">Credenciales</div>
-    <div class="field" id="ant-key-field">
+    <div class="field">
       <label>Anthropic API Key</label>
       <div class="key-wrap">
         <input type="password" id="ant-key" placeholder="sk-ant-xxxxxxxxxx" autocomplete="off" style="max-width:480px">
         <button class="eye-btn" onclick="toggleEye('ant-key',this)">👁</button>
       </div>
     </div>
-    <div style="font-size:.68rem;color:var(--muted);margin-top:-4px" id="key-hint">
+    <div style="font-size:.68rem;color:var(--muted);margin-top:-4px">
       🔒 Tu key se envía directo a Anthropic y no se almacena en ningún servidor.<br>
       🌐 El scraping usa <strong>Jina AI</strong> (gratis, sin API key necesaria).
     </div>
@@ -821,4 +821,4 @@ document.addEventListener('keydown', e => {
 });
 </script>
 </body>
-</html> 
+</html>
