@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeerFlow — Benchmark Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060A;--bg2:#0D0D15;--bg3:#14141F;--bg4:#1B1B28;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--border3:rgba(255,255,255,0.22);
+  --accent:#E8D44D;--accent2:#c9b73a;--accent-dim:rgba(232,212,77,0.12);
+  --red:#E53535;--green:#22C55E;--blue:#3B82F6;--orange:#F97316;
+  --muted:#555566;--muted2:#7070888;--muted3:#9090A8;
+  --text:#F0F0FA;--text2:#B0B0C8;
+  --sans:'Inter',sans-serif;--body:'DM Sans',sans-serif;
+  --r:5px;--r2:10px;--r3:14px;
+  --shadow:0 4px 32px rgba(0,0,0,0.5);
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--body);
+  line-height:1.65;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+/* scanlines */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.018) 3px,rgba(0,0,0,0.018) 4px);
+}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 80px}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.hdr{
+  padding:44px 0 32px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  border-bottom:1px solid var(--border);margin-bottom:44px;
+  animation:dn .5s ease both;
+}
+.hdr-left{}
+.eyebrow{
+  font-family:var(--sans);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:8px;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--accent)}
+.main-title{
+  font-family:var(--sans);font-size:clamp(1.8rem,5vw,2.8rem);
+  font-weight:700;line-height:1.1;letter-spacing:-.02em;color:var(--text);
+}
+.subtitle{font-family:var(--body);color:var(--muted3);font-size:.85rem;margin-top:8px}
+.hdr-tag{
+  text-align:right;font-family:var(--sans);font-size:.65rem;color:var(--muted);
+  line-height:1.8;
+}
+.hdr-tag strong{color:var(--text2);display:block;font-size:.72rem;font-weight:600}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r3);padding:28px;margin-bottom:16px;
+  transition:.2s;
+}
+.card-title{
+  font-family:var(--sans);font-weight:700;font-size:.75rem;
+  text-transform:uppercase;letter-spacing:.13em;color:var(--text2);
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;
+}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Form controls ───────────────────────────────────────────── */
+label{display:block;font-family:var(--sans);font-size:.72rem;font-weight:600;color:var(--muted3);margin-bottom:6px;letter-spacing:.04em}
+
+input[type=text],input[type=password],input[type=url]{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r);color:var(--text);font-family:var(--body);font-size:.88rem;
+  padding:10px 14px;outline:none;transition:.15s;
+}
+input:focus{border-color:var(--accent);background:var(--bg4)}
+input::placeholder{color:var(--muted)}
+.field{margin-bottom:18px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+
+.key-wrap{position:relative}
+.key-wrap input{padding-right:38px}
+.eye-btn{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:14px;padding:4px;transition:.15s;
+}
+.eye-btn:hover{color:var(--text2)}
+
+/* ── URL list ────────────────────────────────────────────────── */
+#url-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.url-row{
+  display:grid;grid-template-columns:30px 1fr 40px 36px;
+  gap:8px;align-items:center;
+  animation:fi .25s ease both;
+}
+.url-idx{
+  font-size:.68rem;color:var(--muted);text-align:center;
+  font-family:var(--sans);font-weight:500;
+}
+.url-yours-btn{
+  background:none;border:1px solid var(--border2);
+  border-radius:var(--r);color:var(--muted);
+  font-size:13px;cursor:pointer;transition:.15s;
+  width:40px;height:38px;display:flex;align-items:center;justify-content:center;
+}
+.url-yours-btn.active{
+  background:var(--accent-dim);border-color:rgba(232,212,77,.4);
+  color:var(--accent);
+}
+.url-yours-btn:hover:not(.active){color:var(--accent);border-color:rgba(232,212,77,.3)}
+.url-rm-btn{
+  background:none;border:1px solid var(--border);
+  border-radius:var(--r);color:var(--muted);
+  font-size:13px;cursor:pointer;transition:.15s;
+  width:36px;height:38px;display:flex;align-items:center;justify-content:center;
+}
+.url-rm-btn:hover{color:var(--red);border-color:rgba(255,75,75,.3)}
+
+.add-url-btn{
+  width:100%;background:transparent;border:1px dashed var(--border2);
+  border-radius:var(--r);color:var(--muted3);font-family:var(--body);font-size:.82rem;
+  padding:10px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.add-url-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+
+.yours-hint{
+  font-size:.65rem;color:var(--muted);
+  display:flex;align-items:center;gap:6px;margin-top:8px;
+}
+.yours-hint::before{content:'★';color:var(--accent);font-size:10px}
+
+/* ── Settings row ────────────────────────────────────────────── */
+.settings-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+@media(max-width:500px){.settings-row{grid-template-columns:1fr}}
+
+.workers-wrap{}
+.workers-stepper{
+  display:flex;align-items:center;gap:0;
+  border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;
+}
+.ws-btn{
+  background:var(--bg3);border:none;color:var(--text2);
+  font-family:var(--sans);font-size:1rem;font-weight:600;
+  width:36px;height:38px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.ws-btn:hover{background:var(--bg4);color:var(--text)}
+.ws-val{
+  background:var(--bg3);color:var(--text);font-family:var(--sans);font-size:.88rem;font-weight:600;
+  border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);
+  width:36px;text-align:center;height:38px;outline:none;
+}
+
+/* ── Run button ──────────────────────────────────────────────── */
+.run-btn{
+  width:100%;padding:14px;margin-top:8px;
+  background:var(--accent);color:#060606;
+  font-family:var(--sans);font-weight:800;font-size:.82rem;
+  text-transform:uppercase;letter-spacing:.12em;
+  border:none;border-radius:var(--r2);cursor:pointer;
+  transition:.2s;display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.run-btn:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(232,212,77,.25)}
+.run-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── Progress panel ──────────────────────────────────────────── */
+#progress-panel{display:none}
+.prog-title{
+  font-family:var(--sans);font-weight:700;
+  font-size:1.2rem;letter-spacing:-.01em;color:var(--text);margin-bottom:24px;
+}
+
+.phase-row{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:14px 0;border-bottom:1px solid var(--border);
+  transition:.3s;
+}
+.phase-row:last-child{border-bottom:none}
+.phase-icon{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;margin-top:2px;
+  background:var(--bg3);border:1px solid var(--border2);
+  transition:.3s;
+}
+.phase-icon.active{background:var(--accent-dim);border-color:rgba(232,212,77,.4);animation:pulse 1.5s ease infinite}
+.phase-icon.done{background:rgba(61,218,132,.12);border-color:rgba(61,218,132,.35);color:var(--green)}
+.phase-icon.error{background:rgba(255,75,75,.12);border-color:rgba(255,75,75,.35);color:var(--red)}
+.phase-body{flex:1;min-width:0}
+.phase-label{font-family:var(--body);font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:6px}
+.phase-label.active{color:var(--accent)}
+.phase-label.done{color:var(--text2)}
+
+/* Site progress sub-list */
+.site-items{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.site-item{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--body);font-size:.78rem;color:var(--muted3);
+  padding:5px 10px;border-radius:var(--r);
+  background:var(--bg3);border:1px solid var(--border);
+  transition:.2s;
+}
+.site-item.ok{color:var(--text2);border-color:rgba(61,218,132,.2)}
+.site-item.err{color:var(--red);border-color:rgba(255,75,75,.2)}
+.site-item.loading{color:var(--muted3);animation:blink 1.2s ease infinite}
+.si-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--muted)}
+.si-dot.ok{background:var(--green)}.si-dot.err{background:var(--red)}.si-dot.loading{background:var(--accent);animation:pulse 1s ease infinite}
+.si-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.si-chars{color:var(--muted);font-size:.62rem;flex-shrink:0}
+
+/* Agent progress sub-list */
+.agent-items{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.agent-pill{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--sans);font-size:.72rem;font-weight:500;
+  padding:5px 11px;border-radius:99px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--muted3);transition:.25s;
+}
+.agent-pill.active{border-color:rgba(232,212,77,.3);color:var(--accent);animation:pulse 1.5s ease infinite}
+.agent-pill.ok{border-color:rgba(61,218,132,.3);color:var(--green);background:rgba(61,218,132,.08)}
+.agent-pill.err{border-color:rgba(255,75,75,.3);color:var(--red);background:rgba(255,75,75,.08)}
+
+/* Error box */
+.error-box{
+  background:rgba(255,75,75,.08);border:1px solid rgba(255,75,75,.25);
+  border-radius:var(--r2);padding:16px 20px;margin-top:16px;
+  font-size:.75rem;color:var(--red);line-height:1.6;
+  display:none;
+}
+
+/* ── Result panel ────────────────────────────────────────────── */
+#result-panel{display:none;animation:fi .5s ease both}
+.result-hero{
+  background:linear-gradient(135deg,var(--bg2),rgba(232,212,77,.05));
+  border:1px solid rgba(232,212,77,.2);
+  border-radius:var(--r3);padding:28px;margin-bottom:16px;
+  text-align:center;
+}
+.result-score{
+  font-family:var(--sans);font-size:4rem;font-weight:700;letter-spacing:-.04em;
+  color:var(--accent);line-height:1;margin-bottom:4px;
+}
+.result-score-lbl{font-family:var(--sans);font-size:.68rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:20px}
+.result-summary{
+  font-family:var(--body);font-size:1rem;color:var(--text);line-height:1.75;
+  text-align:left;background:var(--bg3);border-radius:var(--r2);
+  padding:18px 22px;border-left:3px solid var(--accent);
+}
+.result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.act-btn{
+  flex:1;padding:12px 16px;border-radius:var(--r2);
+  font-family:var(--sans);font-weight:700;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.1em;
+  cursor:pointer;transition:.15s;border:none;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  text-decoration:none;
+}
+.act-primary{background:var(--accent);color:#060606}
+.act-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.act-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.act-secondary:hover{background:var(--bg4);color:var(--text);border-color:var(--border3)}
+
+/* Score mini-grid */
+.mini-scores{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:16px}
+.mini-sc{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r2);padding:12px 14px;
+}
+.mini-sc.yours{border-color:rgba(232,212,77,.3)}
+.ms-url{font-family:var(--sans);font-size:.65rem;font-weight:500;color:var(--muted2);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-score{font-family:var(--sans);font-size:1.9rem;font-weight:700;letter-spacing:-.02em}
+.ms-lbl{font-family:var(--sans);font-size:.6rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.foot{
+  border-top:1px solid var(--border);padding:20px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--sans);font-size:.68rem;color:var(--muted);flex-wrap:wrap;gap:8px;
+}
+.server-dot{
+  display:inline-flex;align-items:center;gap:6px;font-weight:500;
+}
+.dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--muted);flex-shrink:0;
+}
+.dot.on{background:var(--green);animation:pulse 2s ease infinite}
+.dot.off{background:var(--red)}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes blink{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;animation:spin .8s linear infinite}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="eyebrow">MKTLAB Quick Benchmarking Engine</div>
+      <div class="main-title">Competitive<br>Intelligence</div>
+      <div class="subtitle">Multi-Agent Synthesis · 4 agentes · JSON + Dashboard</div>
+    </div>
+    <div class="hdr-tag">
+      <strong>5 agentes IA</strong>
+      Jina + Claude<br>
+      Output: JSON + Dashboard
+    </div>
+  </div>
+
+  <!-- API Keys -->
+  <div class="card" id="keys-card">
+    <div class="card-title">Credenciales</div>
+    <div class="field" id="ant-key-field">
+      <label>Anthropic API Key</label>
+      <div class="key-wrap">
+        <input type="password" id="ant-key" placeholder="sk-ant-xxxxxxxxxx" autocomplete="off" style="max-width:480px">
+        <button class="eye-btn" onclick="toggleEye('ant-key',this)">👁</button>
+      </div>
+    </div>
+    <div style="font-size:.68rem;color:var(--muted);margin-top:-4px" id="key-hint">
+      🔒 La key se envía al servidor de forma segura. Nunca se almacena en el browser.<br>
+      🌐 El scraping usa <strong>Jina AI</strong> (gratis, sin API key).
+    </div>
+  </div>
+
+  <!-- URLs -->
+  <div class="card">
+    <div class="card-title">Sitios a comparar</div>
+    <div id="url-list"></div>
+    <button class="add-url-btn" onclick="addUrl()">
+      <span>+</span> Agregar sitio
+    </button>
+    <div class="yours-hint">Marcá con ★ el sitio que es tuyo — el resto serán competidores</div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card">
+    <div class="card-title">Configuración</div>
+    <div class="settings-row">
+      <div class="field" style="margin-bottom:0">
+        <label>Workers de extracción (Phase 1 — scraping paralelo)</label>
+        <div class="workers-stepper">
+          <button class="ws-btn" onclick="changeWorkers(-1)">−</button>
+          <input class="ws-val" id="workers" type="text" value="3" readonly>
+          <button class="ws-btn" onclick="changeWorkers(1)">+</button>
+        </div>
+      </div>
+      <div style="font-size:.65rem;color:var(--muted);max-width:260px;line-height:1.6">
+        Más workers = más rápido pero más requests simultáneos a Firecrawl. Recomendado: 3-5.
+      </div>
+    </div>
+  </div>
+
+  <!-- Run button -->
+  <button class="run-btn" id="run-btn" onclick="startBenchmark()">
+    <span>🦌</span> Iniciar Benchmark
+  </button>
+
+  <!-- Progress panel -->
+  <div class="card" id="progress-panel" style="margin-top:16px">
+    <div class="prog-title">Ejecutando pipeline…</div>
+
+    <!-- Phase 1 -->
+    <div class="phase-row" id="ph1-row">
+      <div class="phase-icon" id="ph1-icon">1</div>
+      <div class="phase-body">
+        <div class="phase-label" id="ph1-label">Phase 1 — Extracción de sitios</div>
+        <div class="site-items" id="site-items"></div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-row" id="ph2-row">
+      <div class="phase-icon" id="ph2-icon">2</div>
+      <div class="phase-body">
+        <div class="phase-label" id="ph2-label">Phase 2 — Agentes especializados (x4)</div>
+        <div class="agent-items" id="agent-items">
+          <div class="agent-pill" id="ap-positioning">🎯 Posicionamiento</div>
+          <div class="agent-pill" id="ap-gaps">🔍 Gaps</div>
+          <div class="agent-pill" id="ap-opportunities">💡 Oportunidades</div>
+          <div class="agent-pill" id="ap-scoring">📊 Scoring</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-row" id="ph3-row">
+      <div class="phase-icon" id="ph3-icon">3</div>
+      <div class="phase-body">
+        <div class="phase-label" id="ph3-label">Phase 3 — Reporter Agent (síntesis final)</div>
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+  </div>
+
+  <!-- Result panel -->
+  <div id="result-panel">
+    <div class="result-hero">
+      <div class="result-score" id="res-score">—</div>
+      <div class="result-score-lbl">tu score total</div>
+      <div class="result-summary" id="res-summary">—</div>
+    </div>
+
+    <div class="mini-scores" id="mini-scores"></div>
+
+    <div class="result-actions">
+      <a class="act-btn act-primary" id="dash-link" href="/dashboard" target="_blank">
+        📊 Abrir Dashboard completo
+      </a>
+      <button class="act-btn act-secondary" onclick="downloadJSON()">
+        💾 Descargar JSON
+      </button>
+      <button class="act-btn act-secondary" onclick="downloadMarkdown()">
+        📄 Descargar Markdown
+      </button>
+      <button class="act-btn act-secondary" onclick="resetUI()">
+        ⟳ Nuevo benchmark
+      </button>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="server-dot">
+      <div class="dot" id="server-dot"></div>
+      <span id="server-status">Verificando servidor…</span>
+    </div>
+    <span>© 2026 · R'Evolution Education Group TM · Powered by MktLab</span>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   CONFIG — detecta si estamos en producción o local
+   ════════════════════════════════════════════════════════════════ */
+const API_BASE = window.location.origin; // funciona igual en local y Railway
+
+/* Verificar si la key ya está configurada en el servidor */
+async function checkServerKey() {
+  try {
+    const r = await fetch(`${API_BASE}/api/key-configured`);
+    const d = await r.json();
+    if (d.configured) {
+      // Key en servidor — ocultar campo y mostrar mensaje
+      const field = document.getElementById('ant-key-field');
+      const hint  = document.getElementById('key-hint');
+      if (field) field.style.display = 'none';
+      if (hint)  hint.innerHTML = '✅ API Key configurada en el servidor. No necesitás ingresarla.<br>🌐 Scraping con <strong>Jina AI</strong> (gratis).';
+    }
+  } catch(e) { /* servidor local sin el endpoint — no pasa nada */ }
+}
+checkServerKey();
+let yoursIndex  = 0;
+let urlCount    = 0;
+let currentJob  = null;
+let finalResult = null;
+
+/* ════════════════════════════════════════════════════════════════
+   URL LIST MANAGEMENT
+   ════════════════════════════════════════════════════════════════ */
+function getUrls() {
+  return [...document.querySelectorAll('.url-input')].map(i=>i.value.trim()).filter(Boolean);
+}
+
+function renderUrlList() {
+  const list = document.getElementById('url-list');
+  const rows  = [...list.querySelectorAll('.url-row')];
+  rows.forEach((row, i) => {
+    const idx  = row.querySelector('.url-idx');
+    const star = row.querySelector('.url-yours-btn');
+    if (idx)  idx.textContent = (i+1) + '.';
+    if (star) {
+      star.classList.toggle('active', i === yoursIndex);
+      star.title = i === yoursIndex ? 'Este es tu sitio' : 'Marcar como tu sitio';
+    }
+    row.dataset.index = i;
+  });
+}
+
+function addUrl(value='') {
+  const list = document.getElementById('url-list');
+  const idx  = list.querySelectorAll('.url-row').length;
+  const div  = document.createElement('div');
+  div.className='url-row';
+  div.dataset.index = idx;
+  div.innerHTML = `
+    <span class="url-idx">${idx+1}.</span>
+    <input class="url-input" type="url" placeholder="https://ejemplo.com" value="${value}" spellcheck="false">
+    <button class="url-yours-btn${idx===yoursIndex?' active':''}" title="${idx===yoursIndex?'Tu sitio':'Marcar como tu sitio'}" onclick="setYours(this)">★</button>
+    <button class="url-rm-btn" title="Quitar" onclick="removeUrl(this)">✕</button>`;
+  list.appendChild(div);
+  if (value === '') div.querySelector('input').focus();
+  renderUrlList();
+}
+
+function removeUrl(btn) {
+  const row = btn.closest('.url-row');
+  const idx = [...row.parentNode.children].indexOf(row);
+  if (idx === yoursIndex) yoursIndex = Math.max(0, idx-1);
+  else if (idx < yoursIndex) yoursIndex--;
+  row.style.animation='none';row.style.opacity='0';
+  setTimeout(()=>{row.remove();renderUrlList()}, 150);
+}
+
+function setYours(btn) {
+  const row = btn.closest('.url-row');
+  yoursIndex = [...row.parentNode.children].indexOf(row);
+  renderUrlList();
+}
+
+// Init with 2 urls
+addUrl();
+addUrl();
+
+/* ════════════════════════════════════════════════════════════════
+   WORKERS STEPPER
+   ════════════════════════════════════════════════════════════════ */
+function changeWorkers(delta) {
+  const el = document.getElementById('workers');
+  const v  = Math.min(10, Math.max(1, parseInt(el.value)+delta));
+  el.value = v;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   EYE TOGGLE
+   ════════════════════════════════════════════════════════════════ */
+function toggleEye(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SERVER PING
+   ════════════════════════════════════════════════════════════════ */
+async function pingServer() {
+  const dot = document.getElementById('server-dot');
+  const lbl = document.getElementById('server-status');
+  try {
+    const r = await fetch('/api/status/ping',{signal:AbortSignal.timeout(2000)}).catch(()=>null);
+    // Any response (even 404) means server is up
+    dot.classList.add('on');dot.classList.remove('off');
+    lbl.textContent = 'Servidor activo';
+  } catch {
+    dot.classList.add('off');dot.classList.remove('on');
+    lbl.textContent = 'Servidor no disponible — python api_server.py';
+  }
+}
+pingServer();setInterval(pingServer,10000);
+
+/* ════════════════════════════════════════════════════════════════
+   PHASE HELPERS
+   ════════════════════════════════════════════════════════════════ */
+function phaseActive(n) {
+  const icon  = document.getElementById(`ph${n}-icon`);
+  const label = document.getElementById(`ph${n}-label`);
+  icon.className  = 'phase-icon active';
+  icon.textContent = '⟳';
+  icon.querySelector && (icon.style.animation='spin .8s linear infinite');
+  label.className = 'phase-label active';
+}
+function phaseDone(n, ok=true) {
+  const icon  = document.getElementById(`ph${n}-icon`);
+  const label = document.getElementById(`ph${n}-label`);
+  icon.className  = `phase-icon ${ok?'done':'error'}`;
+  icon.textContent = ok ? '✓' : '✗';
+  icon.style.animation='';
+  label.className = 'phase-label done';
+}
+
+function siteItem(url) {
+  const el  = document.createElement('div');
+  el.className = 'site-item loading';
+  el.id = `si-${btoa(url).replace(/[^a-z0-9]/gi,'')}`;
+  el.innerHTML = `<div class="si-dot loading"></div><span class="si-url">${shortUrl(url)}</span><span class="si-chars"></span>`;
+  return el;
+}
+function siteItemDone(url, ok, chars, err) {
+  const id = `si-${btoa(url).replace(/[^a-z0-9]/gi,'')}`;
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `site-item ${ok?'ok':'err'}`;
+  el.querySelector('.si-dot').className = `si-dot ${ok?'ok':'err'}`;
+  if (ok && chars) el.querySelector('.si-chars').textContent = `${(chars/1000).toFixed(1)}k chars`;
+  if (!ok) el.querySelector('.si-url').textContent += ` — ${err||'error'}`;
+}
+
+function agentState(name, state) {
+  const el = document.getElementById(`ap-${name}`);
+  if (!el) return;
+  el.className = `agent-pill ${state}`;
+}
+
+function shortUrl(u) {
+  try { return new URL(u).hostname; } catch { return u; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BENCHMARK START
+   ════════════════════════════════════════════════════════════════ */
+async function startBenchmark() {
+  const antKey = document.getElementById('ant-key').value.trim();
+  const urls   = getUrls();
+  const workers= parseInt(document.getElementById('workers').value)||3;
+
+  if (!antKey)           return alert('Ingresá tu Anthropic API Key.');
+  if (urls.length < 2)   return alert('Agregá al menos 2 URLs.');
+  if (yoursIndex >= urls.length) return alert('El índice de "tu sitio" está fuera de rango.');
+
+  // Reset UI
+  resetProgress();
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('progress-panel').style.display = '';
+  document.getElementById('result-panel').style.display   = 'none';
+
+  // Build site items for phase 1
+  const siteList = document.getElementById('site-items');
+  siteList.innerHTML = '';
+  urls.forEach(u => siteList.appendChild(siteItem(u)));
+
+  // POST → /api/compare
+  let jobId;
+  try {
+    const res = await fetch('/api/compare', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        urls, yours_index: yoursIndex,
+        firecrawl_key: '',
+        anthropic_key: antKey,
+        extraction_workers: workers,
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Error iniciando el job');
+    }
+    const data = await res.json();
+    jobId = data.job_id;
+    currentJob = jobId;
+  } catch(e) {
+    showError(e.message);
+    document.getElementById('run-btn').disabled = false;
+    return;
+  }
+
+  // SSE stream
+  const sse = new EventSource(`/api/stream/${jobId}`);
+
+  sse.addEventListener('phase_start', e => {
+    const d = JSON.parse(e.data);
+    phaseActive(d.phase);
+    if (d.phase===2) {
+      ['positioning','gaps','opportunities','scoring'].forEach(n=>agentState(n,'active'));
+    }
+  });
+
+  sse.addEventListener('phase_end', e => {
+    const d = JSON.parse(e.data);
+    phaseDone(d.phase);
+  });
+
+  sse.addEventListener('site_done', e => {
+    const d = JSON.parse(e.data);
+    siteItemDone(d.url, d.status==='ok', d.chars, d.error);
+  });
+
+  sse.addEventListener('agent_done', e => {
+    const d = JSON.parse(e.data);
+    agentState(d.agent, d.status==='ok'?'ok':'err');
+  });
+
+  sse.addEventListener('complete', async e => {
+    sse.close();
+    const d = JSON.parse(e.data);
+    // Fetch full result
+    try {
+      const r = await fetch(`/api/result/${jobId}`);
+      finalResult = await r.json();
+      showResult(finalResult);
+    } catch(err) {
+      showError('Pipeline completó pero no se pudo recuperar el resultado: ' + err.message);
+    }
+    document.getElementById('run-btn').disabled = false;
+  });
+
+  sse.addEventListener('error_event', e => {
+    sse.close();
+    const d = JSON.parse(e.data);
+    showError(d.message);
+    document.getElementById('run-btn').disabled = false;
+  });
+
+  sse.onerror = () => {
+    // Connection dropped — check status
+    setTimeout(async () => {
+      try {
+        const s = await fetch(`/api/status/${jobId}`);
+        const d = await s.json();
+        if (d.status === 'done') {
+          sse.close();
+          const r = await fetch(`/api/result/${jobId}`);
+          finalResult = await r.json();
+          showResult(finalResult);
+          document.getElementById('run-btn').disabled = false;
+        } else if (d.status === 'error') {
+          sse.close();
+          showError(d.error || 'Error desconocido');
+          document.getElementById('run-btn').disabled = false;
+        }
+      } catch {}
+    }, 2000);
+  };
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SHOW RESULT
+   ════════════════════════════════════════════════════════════════ */
+function showResult(data) {
+  document.getElementById('result-panel').style.display = '';
+  document.getElementById('result-panel').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // Score
+  const scores = data.scoring?.scores || [];
+  const yours  = scores.find(s=>s.label==='your_site');
+  document.getElementById('res-score').textContent = yours?.total_score ?? '—';
+
+  // Summary
+  document.getElementById('res-summary').textContent = data.executive_summary || '—';
+
+  // Mini scores
+  const ms = document.getElementById('mini-scores');
+  ms.innerHTML = '';
+  scores.forEach((s,i) => {
+    const COLS=['#E8D44D','#5B9CF6','#3DDA84','#FF8C42'];
+    const col  = COLS[i%COLS.length];
+    const iy   = s.label==='your_site';
+    ms.innerHTML += `
+      <div class="mini-sc${iy?' yours':''}">
+        <div class="ms-url">${iy?'⭐ ':''} ${shortUrl(s.url)}</div>
+        <div class="ms-score" style="color:${col}">${s.total_score}</div>
+        <div class="ms-lbl">score total</div>
+      </div>`;
+  });
+
+  // Dashboard link — pass JSON via sessionStorage so dashboard can load it
+  sessionStorage.setItem('benchmarkResult', JSON.stringify(data));
+  document.getElementById('dash-link').addEventListener('click', e => {
+    e.preventDefault();
+    const win = window.open('/dashboard','_blank');
+    // inject data after load
+    setTimeout(()=>{
+      try { win.postMessage({type:'benchmarkData',data}, '*'); } catch {}
+    }, 1200);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DOWNLOADS
+   ════════════════════════════════════════════════════════════════ */
+function downloadJSON() {
+  if (!finalResult) return;
+  const blob = new Blob([JSON.stringify(finalResult,null,2)],{type:'application/json'});
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`benchmark_${Date.now()}.json`});
+  a.click();
+}
+function downloadMarkdown() {
+  if (!finalResult?.markdown_report) return alert('No hay Markdown disponible.');
+  const blob = new Blob([finalResult.markdown_report],{type:'text/markdown'});
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`benchmark_${Date.now()}.md`});
+  a.click();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HELPERS
+   ════════════════════════════════════════════════════════════════ */
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.style.display = '';
+  box.innerHTML = `<strong>❌ Error:</strong> ${msg}`;
+  [1,2,3].forEach(n=>phaseDone(n,false));
+}
+
+function resetProgress() {
+  document.getElementById('error-box').style.display = 'none';
+  [1,2,3].forEach(n=>{
+    const icon  = document.getElementById(`ph${n}-icon`);
+    const label = document.getElementById(`ph${n}-label`);
+    icon.className  = 'phase-icon';
+    icon.textContent = n;
+    icon.style.animation = '';
+    label.className = 'phase-label';
+  });
+  ['positioning','gaps','opportunities','scoring'].forEach(n=>agentState(n,''));
+  document.getElementById('site-items').innerHTML = '';
+}
+
+function resetUI() {
+  finalResult = null;
+  currentJob  = null;
+  document.getElementById('progress-panel').style.display = 'none';
+  document.getElementById('result-panel').style.display   = 'none';
+  document.getElementById('run-btn').disabled = false;
+  document.getElementById('keys-card').scrollIntoView({behavior:'smooth'});
+}
+
+/* ── Keyboard shortcut: Ctrl+Enter to run ────────────────────── */
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') startBenchmark();
+});
+</script>
+</body>
+</html>
